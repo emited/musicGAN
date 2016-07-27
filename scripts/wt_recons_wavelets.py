@@ -26,7 +26,7 @@ t = wa.time
 # reconstruction of the original data
 rx = wa.reconstruction()
 print(np.real(rx))
-wavfile.write('reconstruction.wav', fs, np.real(rx))
+wavfile.write('../data/recons/reconstruction.wav', fs, np.real(rx))
 #import matplotlib.pyplot as plt
 
 #fig, ax = plt.subplots()

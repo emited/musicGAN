@@ -13,5 +13,5 @@ A = pywt.idwt(cA, cD, 'bior2.4', 'sp1')
 print('init data length = '+str(len(data)))
 print('len='+str(len(cA))+' len2='+str(len(cD))+' sum = '+str(len(cA)+len(cD)))
 
-wavfile.write('recons.wav', fs, A)
+wavfile.write('../data/recons/dwt_recons_pywt.wav', fs, A)
 print(A)
