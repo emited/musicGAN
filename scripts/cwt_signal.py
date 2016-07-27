@@ -3,7 +3,7 @@ from scipy import signal
 import matplotlib.pyplot as plt
 from scipy.io import wavfile
 
-sigrate, sig = wavfile.read('voice.wav')
+sigrate, sig = wavfile.read('../data/voice.wav')
 print(sigrate, len(sig))
 
 widths = np.arange(1, 1001)

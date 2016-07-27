@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from scipy.io import wavfile
 
 
-fs, data = wavfile.read('voice.wav')
+fs, data = wavfile.read('../data/voice.wav')
 print(fs)
 print(pywt.wavelist())
 

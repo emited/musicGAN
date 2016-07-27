@@ -4,7 +4,7 @@ import numpy as np
 from scipy.io import wavfile
 
 # given a signal x(t)
-fs, data = wavfile.read('voice.wav')
+fs, data = wavfile.read('../data/voice.wav')
 #print('ok wavfile')
 x = data
 #fs = 300
