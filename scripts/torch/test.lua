@@ -4,27 +4,37 @@ require 'optim'
 require 'audio'
 require 'LSTM'
 
---------------------------------------------
---------------- PARAMETERS -----------------
---------------------------------------------
+------------------------------------------------------
+-------------------- PARAMETERS ----------------------
+------------------------------------------------------
 
 --setting up parameters
 opt = {
+	---data
 	data_path = '../../data/voice.mp3',
-	input_dim = 7,
-	target_dim = 3,
-	hidden_dim = 10,
-	batch_dim = 9,
-	fold_gap = 2,
+	input_dim = 20,
+	target_dim = 5,
+	batch_dim = 1,
+	fold_gap = 5,
+
+	--model
+	num_layers = 1,
+	rnn_size = 5,
+	evaluate_every = 1,
+	max_epoch = 10000,
+	optim_name = 'adam',
+	optim_parameters = {
+		learningRate = 1e-3,
+	}
 }
 
---------------------------------------------
------------------- DATA --------------------
---------------------------------------------
+------------------------------------------------------
+----------------------- DATA -------------------------
+------------------------------------------------------
 
 --loading input data
 data = audio.load(opt.data_path):view(-1)
-data = data[{{1, 41}}]
+data = data[{{1, 401}}]
 data_size = data:size(1)
 print('data size = '..data_size)
 
@@ -60,21 +70,58 @@ batches.target = batches.full[{{},{},{opt.input_dim+1, opt.target_dim+opt.input_
 print('number of batches = '..batches.dim)
 
 
---------------------------------------------
------------------ MODEL --------------------
---------------------------------------------
+------------------------------------------------------
+--------------------- MODEL --------------------------
+------------------------------------------------------
 
---initializing LSTM network
+c0 = torch.zeros(batches.dim, opt.target_dim)
+h0 = torch.zeros(batches.dim, opt.target_dim)
 x = batches
-c0 = torch.zeros(batches.dim, opt.hidden_dim)
-h0 = torch.zeros(batches.dim, opt.hidden_dim)
 
-lstm = nn.LSTM(opt.input_dim, opt.hidden_dim)
+
+--initializing network
+net = nn.Sequential()
+rnns = {}
+for i = 1, opt.num_layers do
+	local prev_dim = opt.rnn_size
+	if i == 1 then prev_dim = opt.input_dim end
+	rnn = nn.LSTM(prev_dim, opt.target_dim)
+	rnn.remember_states = true
+	rnns[#rnns] = rnn
+	net:add(rnn)
+end
+--view1 = nn.View(1, 1, -1):setNumInputDims(3)
+--view2 = nn.View(1, -1):setNumInputDims(2)
+--net:add(view1)
+--net:add(nn.Linear(opt.target_dim, opt.rnn_size))
+--net:add(view2)
+
+
+--lstm = nn.LSTM(opt.input_dim, opt.target_dim)
 criterion = nn.MSECriterion()
+params, gradParams = net:getParameters()
 
--- forward and backward
-h = lstm:forward(x.input)
-print(h)
-loss_x = criterion:forward(h, x.target)
-grad_h = criterion:backward(h, x.target)
-grad_c0, grad_h0, grad_x = unpack(lstm:backward(x.input, grad_h))
+--preparing train
+feval = function(params_new)
+	if params ~= params_new then params:copy(params_new) end
+	h = net:forward(x.input[1])
+	print(h:size())
+	loss_x = criterion:forward(h, x.target)
+	grad_h = criterion:backward(h, x.target)
+	--grad_c, grad_h, grad_x = unpack(lstm:backward({c0, h0, x.input}, grad_h))
+	return loss_x, gradParams
+end
+
+--training
+local epoch = 0
+for i = 1, opt.max_epoch do
+	local loss = 0
+	for j = 1, batches.dim do
+		_, fs = optim[opt.optim_name](feval, params, opt.optim_parameters)
+		loss = loss + fs[1]
+	end
+	if epoch%opt.evaluate_every == 0 then
+		print('loss = '..loss)
+	end
+	epoch = epoch + 1
+end
