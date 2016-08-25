@@ -1,0 +1,11 @@
+/home/emmanuel/torch/install/lib/luarocks/rocks/mrnn/scm-1/lua/mrnn/SimpleModel.lua
+/home/emmanuel/torch/install/lib/luarocks/rocks/mrnn/scm-1/lua/mrnn/FastModel.lua
+/home/emmanuel/torch/install/lib/luarocks/rocks/mrnn/scm-1/lua/mrnn/Model.lua
+/home/emmanuel/torch/install/lib/luarocks/rocks/mrnn/scm-1/lua/mrnn/init.lua
+/home/emmanuel/torch/install/lib/luarocks/rocks/mrnn/scm-1/lua/mrnn/main.lua
+/home/emmanuel/torch/install/lib/luarocks/rocks/mrnn/scm-1/lua/mrnn/model_utils.lua
+/home/emmanuel/torch/install/lib/luarocks/rocks/mrnn/scm-1/lua/mrnn/tools.lua
+/home/emmanuel/torch/install/lib/luarocks/rocks/mrnn/scm-1/lua/mrnn/opt.lua
+/home/emmanuel/torch/install/lib/luarocks/rocks/mrnn/scm-1/lua/mrnn/LSTM.lua
+/home/emmanuel/torch/install/lib/luarocks/rocks/mrnn/scm-1/lua/mrnn/DataSet.lua
+/home/emmanuel/torch/install/lib/luarocks/rocks/mrnn/scm-1/lua/mrnn/view.lua
