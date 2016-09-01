@@ -90,7 +90,7 @@ function FastModel:toCuda()
 end
 
 function FastModel:train()
-	self.model:train()
+	self.model:training()
 	local _, loss = optim[self.opt.optim_name](self.feval, self.params, self.opt.optim_state)
 	return loss[1], self.grad_params:norm()
 end
