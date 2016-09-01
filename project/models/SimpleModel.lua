@@ -16,8 +16,8 @@ function SimpleModel:__init(opt)
 end
 
 
-function SimpleModel:build(X, Y)
-	self.X, self.Y = X, Y
+function SimpleModel:build(data)
+	self.X, self.Y = self:buildBatches(data)
 	self.protos = {}
 	self.opt.input_size = self.opt.framesamp*2
 	self.protos.lstm = mrnn.LSTM(self.opt):build()
@@ -88,6 +88,27 @@ end
 function SimpleModel:train()
 	local _, loss = optim[self.opt.optim_name](self.feval, self.params, self.opt.optim_state)
 	return loss[1], self.grad_params:norm()
+end
+
+
+function SimpleModel:buildBatches(data)
+	local D = data:size(1)
+	local L = self.opt.seq_length
+	local B = self.opt.batch_size
+	local I = self.opt.framesamp*2
+	local X, Y= {}, {}
+	for i = 1, self.opt.nb_batches do
+		X[i] = torch.Tensor(B, L, I)
+		Y[i] = torch.Tensor(B, L, I)
+		for j = 1, B do
+			local _nidx_ = math.random(D-L+1)
+			for k = 1, L do
+				X[i][j][k] = data[_nidx_+j-1]
+				Y[i][j][k] = data[_nidx_+j]
+			end
+		end
+	end
+	return X, Y
 end
 
 

@@ -45,51 +45,43 @@ function DataSet:rescale(data)
 	return (data-self.mean)/(self.max-self.min)
 end
 
-function DataSet:unscale(data)
-	return data*(self.max-self.min)+self.min
+function DataSet:normalize(data)
+	local method = self.opt.normalize
+	if method == 'standardize' then
+		self.std = data:std()
+		self.mean = data:mean()
+		return (data-self.mean)/self.std
+	elseif method == 'squash' then
+		self.min = data:min()
+		self.max = data:max()
+		self.mean = data:mean()
+		return (data-self.mean)/(self.max-self.min)
+	elseif method == 'scale' then
+		self.min = data:min()
+		self.max = data:max()
+		return (data-self.min)/(self.max-self.min)
+	end
 end
 
-function DataSet:standardize(data)
-	self.std = data:std()
-	self.mean = data:mean()
-	return (data-self.mean)/self.std
+function DataSet:unnormalize(data)
+	local method = self.opt.normalize
+	if method == 'standardize' then
+			return data*self.std+self.mean
+	elseif method == 'squash' then
+		return data*(self.max-self.min)+self.mean
+	elseif method == 'scale' then
+		return data*(self.max-self.min)+self.min
+	end
 end
-
-function DataSet:destandardize(data)
-	--launch normalize before
-	return data*self.std+self.mean
-end
-
 
 function DataSet:stft(data)
 	print('computing stft...')
 	local stft = signal.stft(data, self.opt.framesamp, self.opt.hopsamp, self.opt.window_function)
-	return stft:view(-1, 1)
+	return stft:view(stft:size(1), -1)
 end
-
 
 function DataSet:istft(data)
 	print('computing istft...')
 	return signal.istft(data, self.opt.framesamp, self.opt.hopsamp)
 end
 
-
-function DataSet:buildBatches(data)
-	local D = data:size(1)
-	local L = self.opt.seq_length
-	local B = self.opt.batch_size
-	local I = self.opt.framesamp*2
-	local X, Y= {}, {}
-	for i = 1, self.opt.nb_batches do
-		X[i] = torch.Tensor(B, L, I)
-		Y[i] = torch.Tensor(B, L, I)
-		for j = 1, B do
-			local _nidx_ = math.random(D-L+1)
-			for k = 1, L do
-				X[i][j][k] = data[_nidx_+j-1]
-				Y[i][j][k] = data[_nidx_+j]
-			end
-		end
-	end
-	return X, Y
-end
