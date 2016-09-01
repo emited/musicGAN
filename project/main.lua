@@ -11,9 +11,9 @@ local sig = dataset:load()
 local nsig = dataset:standardize(sig)
 local stft = dataset:stft(nsig)
 local X, Y = dataset:buildBatches(stft)
-
+print(X)
 --model
-local model = mrnn.SimpleModel(opt)
+local model = mrnn[opt.model_name](opt)
 model:build(X, Y)
 
 local losses = {}
