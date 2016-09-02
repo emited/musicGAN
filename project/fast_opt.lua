@@ -1,36 +1,41 @@
 
 local opt = {
-	model_name = 'FastModel',
-	max_epochs = 100,
-	seed = 122,
+
+	--print & plotting
 	evaluate_every = 1,
 	print_every = 1,
-	sample_every = 200,
+	sample_every = 50,
 	save_every = 10000,
 	plot_loss = true,
-	sample_rate = 11025,
+	plot_data = false,
 	
 	---data
-	data_file_path = '../data/classics_11025.mp3',
-	model_save_path = 'saved/',
-	sample_save_path = 'saved/',
+	data_file_path = '../data/test_sine.mp3',
+	model_save_path = 'saved/models/',
+	sample_save_path = 'saved/samples/',
 	normalize = 'squash',
-	data_ratio = 0.01,
-	seq_length = 17,
-	batch_size = 27,
-	nb_batches = 10,
+	data_ratio = 1,
+	seq_length = 64,
+	batch_size = 64,
+	nb_batches = 32,
 	framesamp = 1024,
 	hopsamp = 512,
 	window_function = 'hann',
 
 	--model
-	num_layers = 1,
-	rnn_size = 2048,
+	seed = 126,
+	model_name = 'FastModel',
+	max_epochs = 10000,
+	num_layers = 2,
+	rnn_size = 200,
 	optim_name = 'adam',
 	optim_state = {learningRate = 1e-2,},
-	sample_length = 10000,
+	sample_length = 1000,
+	uniform = 0.08,
+	remember = 'neither', --can be train, neither, eval, or both
 	batch_norm = false,
-	cuda = true,
+	use_nngraph = true,
+	cuda = false,
 }
 
 return opt

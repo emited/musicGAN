@@ -26,15 +26,17 @@ function DataSet:__init(opt)
 	assert(opt.model_save_path ~= nil)
 	assert(opt.seq_length ~= nil)
 	assert(opt.batch_size ~= nil)
-	self.opt = mrnn.tools.copy(opt)
+	opt = mrnn.tools.copy(opt)
 end
 
 
 function DataSet:load()
 	-- audio file has to be mono
-	print('loading '..self.opt.data_file_path..'...')
-	local raw, sample_rate = audio.load(self.opt.data_file_path)
-	local stop = math.floor(self.opt.data_ratio*raw:size(1))
+	print('loading '..opt.data_file_path..'...')
+	local raw, rate = audio.load(opt.data_file_path)
+	print('sample rate  = '..rate)
+	self.sample_rate = rate
+	local stop = math.floor(opt.data_ratio*raw:size(1))
 	return raw:sub(1, stop):squeeze()
 end
 
@@ -46,7 +48,7 @@ function DataSet:rescale(data)
 end
 
 function DataSet:normalize(data)
-	local method = self.opt.normalize
+	local method = opt.normalize
 	if method == 'standardize' then
 		self.std = data:std()
 		self.mean = data:mean()
@@ -64,7 +66,7 @@ function DataSet:normalize(data)
 end
 
 function DataSet:unnormalize(data)
-	local method = self.opt.normalize
+	local method = opt.normalize
 	if method == 'standardize' then
 			return data*self.std+self.mean
 	elseif method == 'squash' then
@@ -76,12 +78,28 @@ end
 
 function DataSet:stft(data)
 	print('computing stft...')
-	local stft = signal.stft(data, self.opt.framesamp, self.opt.hopsamp, self.opt.window_function)
+	local stft = signal.stft(data, opt.framesamp, opt.hopsamp, opt.window_function)
 	return stft:view(stft:size(1), -1)
 end
 
 function DataSet:istft(data)
 	print('computing istft...')
-	return signal.istft(data, self.opt.framesamp, self.opt.hopsamp)
+	return signal.istft(data, opt.framesamp, opt.hopsamp)
 end
 
+function DataSet:save(filename, data)
+	local filepath = opt.sample_save_path..filename
+	audio.save(filepath, data:view(-1,1), self.sample_rate)
+end
+
+
+function DataSet:display(data)
+	print('displaying data...')
+	local os = require 'os'
+	torch.save('display.t7', data)
+	local command = '\'require(\"image\") disp = torch.load(\"display.t7\") image.display(disp) \''
+	os.execute(	'echo '..command..' >  display.lua')
+	os.execute('qlua display.lua')
+	os.execute('rm display.lua')
+	os.execute('rm display.t7')
+end

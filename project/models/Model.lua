@@ -2,7 +2,6 @@
 local Model = torch.class('mrnn.Model')
 
 function Model:__init(opt)
-	self.opt = mrnn.tools.copy(opt)
 end
 
 function Model:train()
@@ -10,5 +9,9 @@ function Model:train()
 end
 
 function Model:sample()
+	return nil
+end
+
+function Model:save()
 	return nil
 end

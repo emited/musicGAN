@@ -1,6 +1,6 @@
 require 'mrnn'
 require 'gnuplot'
-local opt = require(arg[1])
+opt = require(arg[1])
 print(opt)
 
 torch.manualSeed(opt.seed)
@@ -10,6 +10,7 @@ local dataset = mrnn.DataSet(opt)
 local sig = dataset:load()
 local nsig = dataset:normalize(sig)
 local stft = dataset:stft(nsig)
+if opt.plot_data then dataset:display(stft) end
 
 --model
 local model = mrnn[opt.model_name](opt)
@@ -24,6 +25,7 @@ for i = 1, max_steps do
 	--training
 	local loss, grad_norm = model:train()
 	losses[#losses+1] = loss
+	collectgarbage()
 
 	--printing and plotting	
 	if i % opt.print_every == 0 then
@@ -33,17 +35,16 @@ for i = 1, max_steps do
 
 	--sampling
 	if i % opt.sample_every == 0 then
-		local t = os.time()
-    t = os.date('%d_%b_%Y_%H:%M:%S',t)
 		local output = model:sample()
+		if plot_data then dataset:display(output) end
 		local sig = dataset:istft(output)
-		local nsig = dataset:destandardize(sig)
-		audio.save('sample'..t..'.mp3', nsig, opt.sample_rate)
+		local nsig = dataset:unnormalize(sig)
+		dataset:save('sample'..i..'.mp3', nsig)
 	end
 
 	--saving model
-	--if i % opt.save_every == 0 then
-	--	torch.save(opt.savefile..'_epoch_'..i..'.t7', protos)
-	--end
+	if i % opt.save_every == 0 then
+		model:save('model'..i..'.t7')
+	end
 
 end
