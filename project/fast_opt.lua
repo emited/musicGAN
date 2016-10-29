@@ -24,6 +24,7 @@ local opt = {
 
 	--model
 	seed = 126,
+	randomize_batch = false,
 	model_name = 'FastModel',
 	max_epochs = 10000,
 	num_layers = 2,
@@ -32,7 +33,7 @@ local opt = {
 	optim_state = {learningRate = 1e-2,},
 	sample_length = 1000,
 	uniform = 0.08,
-	remember = 'neither', --can be train, neither, eval, or both
+	remember = 'both', --can be train, neither, eval, or both
 	batch_norm = false,
 	use_nngraph = true,
 	cuda = false,

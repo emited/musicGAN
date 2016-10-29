@@ -11,15 +11,13 @@ local opt = {
 	framesamp = 1024,
 	hopsamp = 512,
 	window_function = 'hann',
-
 	max_epochs = 10,
 	seed = 122,
 	evaluate_every = 1,
 	print_every = 1,
 	sample_every = 200,
 	save_every = 10000,
-	sample_rate = 11025,
-	
+	sample_rate = 11025,	
 	--model
 	num_layers = 1,
 	rnn_size = 256,

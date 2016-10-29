@@ -80,7 +80,11 @@ function FastModel:buildBatches(data)
 		local start = {}
 		for j = 1, T do
 			for k = 1, N do
-				start[k] = start[k] or math.random(D-T-1)
+				if opt.randomize_batch then
+					start[k] = start[k] or math.random(D-T-1)
+				else
+					start[k] = start[k] or start[k-1] + T
+				end
 				X[i][j][k] = data[start[k]+j-1]
 				Y[i][j][k] = data[start[k]+j]
 			end
